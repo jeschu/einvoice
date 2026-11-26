@@ -1,0 +1,158 @@
+<html lang="de">
+<head>
+    <style>
+        @font-face {
+            font-family: 'Inv';
+            src: url('{{ .fontPath }}');
+        }
+
+        @font-face {
+            font-family: 'InvBold';
+            font-weight: bold;
+            src: url('{{ .fontPath }}');
+        }
+
+        body {
+            font-family: 'Inv';
+            font-size: 10px;
+            margin: 0;
+        }
+
+        b, strong, th, .bold {
+            font-family: 'InvBold';
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        h2 {
+            font-size: 13px;
+            color: #2c2e50;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        p {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            text-align: left;
+            padding: 6px 8px;
+            border-bottom: 2px solid #333;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .total td {
+            border-top: 2px solid #333;
+            font-weight: bold;
+        }
+
+        .meta {
+            color: #555;
+        }
+
+        hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+<body>
+<h1>Rechnung {{ .invoice.Number }}</h1>
+<hr/>
+<p>
+    <b>Rechnungsnummer:</b> {{ .invoice.Number }},
+    <b>Rechnungsdatum:</b> {{ .invoice.IssueDate.Format "02.01.2006" }}
+</p>
+
+<h2>Von</h2>
+<p>{{ .invoice.Seller.Name }}</p>
+
+<table>
+    <tr>
+        <th>#</th>
+        <th>Beschreibung</th>
+        <th>Anzahl</th>
+        <th>Einzelpreis</th>
+        <th>Preis</th>
+        <th>USt-Code</th>
+    </tr>
+    {{ range .invoice.Lines }}
+    <tr>
+        <td class="right">{{ .ID }}</td>
+        <td>{{ .Description }}</td>
+        <td class="right">{{ .Quantity }}</td>
+        <td class="right">{{ .UnitPrice }}</td>
+        <td class="right">{{ .LineTotal }}</td>
+        <td>{{ .TaxCategoryCode }}</td>
+    </tr>
+    {{ end }}
+</table>
+<table>
+    <tr>
+        <td colspan="6">Umsatzsteuer:</td>
+    </tr>
+    <tr>
+        <th>USt-Code</th>
+        <th>USt-Satz</th>
+        <th>Netto</th>
+        <th>USt</th>
+    </tr>
+    {{ range .invoice.TaxTotals }}
+    <tr>
+        <td>{{ .CategoryCode }}</td>
+        <td class="right">{{ .RatePercent }}</td>
+        <td class="right">{{ .TaxableAmount }}</td>
+        <td class="right">{{ .TaxAmount }}</td>
+    </tr>
+    {{ end }}
+</table>
+<table>
+    <tr>
+        <td>Netto:</td>
+        <td class="right">{{ .invoice.Totals.LineTotal }}</td>
+    </tr>
+    <tr>
+        <td>USt-Netto:</td>
+        <td class="right">{{ .invoice.Totals.TaxBasisTotal }}</td>
+    </tr>
+    <tr>
+        <td>USt:</td>
+        <td class="right">{{ .invoice.Totals.TaxTotal }}</td>
+    </tr>
+    <tr>
+        <td>Summe:</td>
+        <td class="right">{{ .invoice.Totals.GrandTotal }}</td>
+    </tr>
+    <tr>
+        <td>Fälliger Betrag::</td>
+        <td class="right">{{ .invoice.Totals.DuePayableAmount }}</td>
+    </tr>
+</table>
+<p class="meta" style="margin-top: 14px;">Bank: Bankname. IBAN: DExxBBBBBBBBKKKKKKKKKK</p>
+<p class="meta" style="margin-top: 14px;">Zahlungsbedingungen: {{ .invoice.PaymentTerms }}</p>
+<p class="meta">Diese Rechnung enthält ein Factur-X XML.</p>
+</body>
+</html>
